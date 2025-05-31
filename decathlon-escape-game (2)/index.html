@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decathlon Escape Game - El Laboratorio del Futuro</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .animate-bounce { animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        function DecathlonEscapeGame() {
+            const [gameState, setGameState] = useState("intro");
+            const [timeLeft, setTimeLeft] = useState(3600);
+            const [isGameActive, setIsGameActive] = useState(false);
+            
+            // Timer effect
+            useEffect(() => {
+                if (!isGameActive) return;
+                
+                const timer = setInterval(() => {
+                    setTimeLeft((prev) => {
+                        if (prev <= 1) {
+                            setGameState("defeat");
+                            setIsGameActive(false);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+                
+                return () => clearInterval(timer);
+            }, [isGameActive]);
+            
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+            };
+            
+            const startGame = () => {
+                setIsGameActive(true);
+                setGameState("hub");
+            };
+            
+            if (gameState === "intro") {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-red-50 p-4">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="bg-white rounded-lg shadow-lg p-8">
+                                <div className="text-center space-y-8 p-8">
+                                    <div className="space-y-6">
+                                        <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-red-500">
+                                            DECATHLON ESPAÑA
+                                        </h1>
+                                        <h2 className="text-3xl font-bold text-gray-700">EL LABORATORIO DEL FUTURO</h2>
+                                        
+                                        <div className="bg-gradient-to-r from-blue-100 to-red-100 rounded-lg p-6 max-w-2xl mx-auto">
+                                            <p className="text-lg text-gray-700 mb-4">¡Bienvenidos al proyecto que cambiará la humanidad!</p>
+                                            <p className="text-md text-gray-600">El futuro del deporte está en vuestras manos.</p>
+                                            <p className="text-md text-gray-600 mt-2">
+                                                ¿Podéis descifrar el secreto antes de que sea demasiado tarde?
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="bg-red-100 border border-red-300 rounded-lg p-4 max-w-lg mx-auto">
+                                            <div className="flex items-center justify-center gap-2 text-red-700">
+                                                <span>🕒</span>
+                                                <p className="font-semibold">⏰ Tenéis 60 minutos - Cada error = -1 minuto</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <button
+                                            onClick={startGame}
+                                            className="bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white font-bold py-4 px-8 rounded-lg text-lg"
+                                        >
+                                            ⚡ INICIAR MISIÓN
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (gameState === "hub") {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-6">
+                        <div className="max-w-6xl mx-auto space-y-8">
+                            <div className="text-center space-y-4">
+                                <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                                    DECATHLON ESCAPE GAME
+                                </h1>
+                                <p className="text-xl text-blue-200">El Laboratorio del Futuro</p>
+                                
+                                <div className="bg-black/60 backdrop-blur-sm border border-blue-500/50 rounded-lg px-6 py-3 inline-block">
+                                    <div className="flex items-center gap-2">
+                                        <span>🕒</span>
+                                        <span className="font-mono text-xl font-bold text-blue-300">{formatTime(timeLeft)}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-400 text-center">TIEMPO GLOBAL</p>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-black/40 backdrop-blur-sm border border-blue-500/50 shadow-xl rounded-lg p-6">
+                                    <div className="text-center space-y-4">
+                                        <div className="w-16 h-16 bg-blue-600 rounded-full mx-auto flex items-center justify-center">
+                                            <span className="text-white text-2xl">📦</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-blue-400">SALA 1: LOGÍSTICA</h3>
+                                        <p className="text-gray-400">Análisis de etiquetas y validación de cajas</p>
+                                        <button 
+                                            onClick={() => setGameState("sala1")}
+                                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-4 rounded-lg"
+                                        >
+                                            ACCEDER 🔓
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-black/40 backdrop-blur-sm border border-red-500/50 shadow-xl rounded-lg p-6 opacity-70">
+                                    <div className="text-center space-y-4">
+                                        <div className="w-16 h-16 bg-red-600 rounded-full mx-auto flex items-center justify-center">
+                                            <span className="text-white text-2xl">⚙️</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-red-400">SALA 2: SIMULADOR</h3>
+                                        <p className="text-gray-400">Reinicio del simulador de prueba defectuoso</p>
+                                        <button 
+                                            disabled
+                                            className="w-full bg-gray-600 text-gray-400 py-2 px-4 rounded-lg cursor-not-allowed"
+                                        >
+                                            BLOQUEADO 🔒
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-black/40 backdrop-blur-sm border border-green-500/50 shadow-xl rounded-lg p-6 opacity-70">
+                                    <div className="text-center space-y-4">
+                                        <div className="w-16 h-16 bg-green-600 rounded-full mx-auto flex items-center justify-center">
+                                            <span className="text-white text-2xl">🏆</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-green-400">SALA 3: CONTROL FINAL</h3>
+                                        <p className="text-gray-400">Validación del informe de envío</p>
+                                        <button 
+                                            disabled
+                                            className="w-full bg-gray-600 text-gray-400 py-2 px-4 rounded-lg cursor-not-allowed"
+                                        >
+                                            BLOQUEADO 🔒
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (gameState === "sala1") {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-6">
+                        <div className="max-w-6xl mx-auto space-y-8">
+                            <button 
+                                onClick={() => setGameState("hub")}
+                                className="border border-blue-500/50 text-blue-300 hover:bg-blue-500/20 py-2 px-4 rounded-lg"
+                            >
+                                ← VOLVER AL HUB
+                            </button>
+                            
+                            <div className="text-center">
+                                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                                    CONTROL LOGÍSTICO
+                                </h1>
+                                <p className="text-blue-200 text-sm">SALA 1 • VALIDACIÓN DE CAJAS</p>
+                            </div>
+                            
+                            <div className="bg-black/40 backdrop-blur-sm border border-green-500/50 rounded-lg p-8 text-center">
+                                <div className="space-y-6">
+                                    <div className="w-20 h-20 bg-green-600 rounded-full mx-auto flex items-center justify-center animate-pulse">
+                                        <span className="text-white text-3xl">✅</span>
+                                    </div>
+                                    <h2 className="text-3xl font-bold text-green-300">¡SALA 1 COMPLETADA!</h2>
+                                    <p className="text-green-200">Has identificado correctamente la caja defectuosa</p>
+                                    <p className="text-green-200">Caja D: Peso incorrecto (debería ser 3.75 kg)</p>
+                                    
+                                    <button 
+                                        onClick={() => setGameState("victory")}
+                                        className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 px-6 rounded-lg text-lg"
+                                    >
+                                        CONTINUAR AL FINAL 🎯
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            if (gameState === "victory") {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-green-900 via-blue-900 to-purple-900 p-6">
+                        <div className="max-w-4xl mx-auto space-y-8">
+                            <div className="text-center space-y-8">
+                                <div className="space-y-4">
+                                    <div className="w-24 h-24 bg-green-600 rounded-full mx-auto flex items-center justify-center animate-bounce">
+                                        <span className="text-white text-4xl">🏆</span>
+                                    </div>
+                                    <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-400 to-purple-400">
+                                        ✅ PRUEBA DE PRODUCTO VALIDADA
+                                    </h1>
+                                </div>
+                                
+                                <div className="bg-black/40 backdrop-blur-sm border border-green-500/30 shadow-2xl max-w-2xl mx-auto rounded-lg p-8">
+                                    <p className="text-xl text-green-200 font-semibold mb-6">
+                                        Acabas de hacerlo mejor que un almacén automatizado y un escáner de 8000€.
+                                    </p>
+                                    
+                                    <div className="space-y-3 text-lg mb-6">
+                                        <div className="flex items-center gap-3 text-green-300">
+                                            <span>✅</span>
+                                            <span>Has corregido una etiqueta defectuosa</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-green-300">
+                                            <span>✅</span>
+                                            <span>Has salvado una prueba de producto de una caja defectuosa</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-green-300">
+                                            <span>✅</span>
+                                            <span>Has desenmascarado un error de stock antes que el café</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-6">
+                                        <p className="text-2xl font-bold text-blue-300 mb-4">En resumen: estás contratado/a.</p>
+                                        
+                                        <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                                            <div className="bg-black/40 rounded-lg p-3">
+                                                <p className="text-gray-400">Tiempo total</p>
+                                                <p className="text-blue-300 font-bold text-lg">{formatTime(3600 - timeLeft)}</p>
+                                            </div>
+                                            <div className="bg-black/40 rounded-lg p-3">
+                                                <p className="text-gray-400">Misión</p>
+                                                <p className="text-blue-300 font-bold text-lg">COMPLETADA</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="space-y-4">
+                                            <p className="text-lg text-gray-300">→ Puedes salir.</p>
+                                            <p className="text-lg text-gray-300">
+                                                → O reiniciar el simulador si quieres impresionar a tus compañeros.
+                                            </p>
+                                        </div>
+                                        
+                                        <button
+                                            onClick={() => window.location.reload()}
+                                            className="w-full mt-4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-3 px-6 rounded-lg"
+                                        >
+                                            ⭐ IMPRESIONAR A LOS COMPAÑEROS
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return <div>Estado del juego no reconocido</div>;
+        }
+        
+        ReactDOM.render(<DecathlonEscapeGame />, document.getElementById('root'));
+    </script>
+</body>
+</html>
